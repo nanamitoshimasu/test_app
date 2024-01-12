@@ -7,7 +7,7 @@ services:
     volumes:
       - postgres_volume:/var/lib/postgresql/data
     ports:
-      - '5432:5432'
+      - '5433:5432'
   web:
     build:
       context: .
@@ -17,7 +17,7 @@ services:
       - .:/test_app
       - node_modules:/test_app/node_modules
     ports:
-      - 3000:3000
+      - 3001:3000
     stdin_open: true
     tty: true
     depends_on:

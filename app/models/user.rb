@@ -1,5 +1,5 @@
 class User < ApplicationRecord   
- # authenticates_with_sorcery!
+  authenticates_with_sorcery!
 
   validates :password, length: { minimum: 3 }, if: -> { new_record? || changes[:crypted_password] } 
   validates :password, confirmation: true, if: -> { new_record? || changes[:crypted_password] } 
@@ -8,5 +8,6 @@ class User < ApplicationRecord
   validates :email, uniqueness: true, presence: true
   validates :name, presence: true, length: { maximum: 255 }
 
-  has_many :timers
+  has_many :timers, dependent: :destroy
+  has_many :break_times, dependent: :destroy
 end
