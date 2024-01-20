@@ -2,8 +2,9 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["hours", "minutes", "modal", "modalTarget", "pauseResumeButton"]
-
+  static targets = ["hours", "minutes", "pauseResumeButton", "modalTime", "flashMessage"]
+  timerStarted = false;
+  
   initialize() {
     this.timerInterval = null;
     this.totalSeconds = 0;
@@ -31,7 +32,9 @@ export default class extends Controller {
       .then(data => {
         // タイマー開始
         this._startTimer();
+        this.timerStarted = true; // タイマーが開始されたことを追跡   
         this.isPaused = false;
+        this.flashMessageTarget.classList.add('hidden');
       })
       .catch(error => {
         console.error('エラー:', error);
@@ -40,6 +43,12 @@ export default class extends Controller {
 
   togglePauseResume() {
     console.log("Toggle pause/resume called. Current state: ", this.isPaused);
+    // タイマーが開始されていない場合、フラッシュメッセージを表示して処理を終了する
+  if (!this.timerStarted) {
+    this.showFlashMessage("スタートが押されていません！");
+    this.flashMessageTarget.classList.remove('hidden');
+    return;
+  }
   if (this.isPaused) {
     // タイマーが一時停止されていた場合、再開する
     // サーバーに再開時刻を送信
@@ -65,7 +74,7 @@ export default class extends Controller {
         this.isPaused = false;
       })
       .catch(error => {
-        console.error('エラー:', error);
+        this.showFlashMessage(error.message);
       });
 
   } else {
@@ -83,7 +92,7 @@ export default class extends Controller {
         if (response.ok) {
           return response.json();
         } else {
-          throw new Error('サーバーエラーが発生しました');
+          throw new Error(data.error || 'エラーが発生しました');
         }
       })
       .then(data => {
@@ -94,24 +103,25 @@ export default class extends Controller {
         this.isPaused = true;
       })
       .catch(error => {
-        console.error('エラー:', error);
+        this.showFlashMessage(error.message);
       });
     }
   }
-
-  end() {
-    // タイマーを停止
-    clearInterval(this.timerInterval);
-    this.timerInterval = null;
-    // サーバーに終了時刻を送信
-    fetch('/timers/end', { 
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': window.getCsrfToken()
-      },
-    })
+  
+    end() {
+    if (this.timerStarted) {
+      // タイマーを停止
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+      // サーバーに終了時刻を送信
+      fetch('/timers/end', { 
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRF-Token': window.getCsrfToken()
+        },
+      })
       .then(response => {
         if (response.ok) {
           return response.json();
@@ -123,13 +133,28 @@ export default class extends Controller {
         // タイマー表示をリセット
         this._resetTimer();
         // モーダルに時間を表示
+        const duration = data.calculated_time;
+        const hours = Math.floor(duration / 3600);
+        const minutes = Math.floor((duration % 3600) / 60);
         this.modalTimeTarget.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-        this.modalTarget.classList.remove('hidden');
       })
       .catch(error => {
         console.error('エラー:', error);
       });
+    }
+
+    else if (!this.timerStarted) {
+      // タイマーがまだ開始されていない場合、フラッシュメッセージを表示
+      this.flashMessageTarget.textContent = "スタートが押されていません！";
+      this.flashMessageTarget.classList.remove('hidden');
+      return;
+    }
   }
+  
+  showFlashMessage(message) {
+      this.flashMessageTarget.textContent = message;
+      this.flashMessageTarget.classList.remove('hidden');
+    }
 
  
   // プライベートメソッド

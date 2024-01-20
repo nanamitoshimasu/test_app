@@ -16,10 +16,12 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_05_023534) do
 
   create_table "break_times", force: :cascade do |t|
     t.bigint "user_id", null: false
+    t.bigint "timer_id", null: false
     t.datetime "break_start_time", null: false
     t.datetime "break_end_time"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["timer_id"], name: "index_break_times_on_timer_id"
     t.index ["user_id"], name: "index_break_times_on_user_id"
   end
 
@@ -42,6 +44,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_05_023534) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
+  add_foreign_key "break_times", "timers"
   add_foreign_key "break_times", "users"
   add_foreign_key "timers", "users"
 end

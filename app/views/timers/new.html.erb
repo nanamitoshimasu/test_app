@@ -1,42 +1,50 @@
 <html data-theme="pastel">
   <div data-controller="timer">
-    <div class="flex justify-center items-center min-h-screen bg-gray-100">
-      <div class="text-center">
-        <div class="grid grid-flow-col gap-5 text-center auto-cols-max">
-          <div class="flex flex-col">
-            <span class="font-mono text-5xl">
-              <span data-timer-target="hours">00</span>
-            </span>
-            時間 
-          </div> 
-          <div class="flex flex-col">
-            <span class="font-mono text-5xl">
-              <span data-timer-target="minutes">00</span>
-            </span>
-            分
+    <div data-timer-target="flashMessage" class="hidden"></div>
+    <div data-controller="modal" data-action="keydown.esc->modal#close">
+      <div class="flex justify-center items-center min-h-screen bg-gray-100">
+        <div class="text-center">
+          <div class="grid grid-flow-col gap-5 text-center auto-cols-max">
+            <div class="flex flex-col">
+              <span class="font-mono text-5xl">
+                <span data-timer-target="hours">00</span>
+              </span>
+              時間 
+            </div> 
+            <div class="flex flex-col">
+              <span class="font-mono text-5xl">
+                <span data-timer-target="minutes">00</span>
+              </span>
+              分
+            </div>
           </div>
-        </div>
-        
-        <!-- ストップウォッチのコントロールボタン -->
-        <div class="flex flex-initial">
-          <%= button_tag type: 'button', data: { action: "click->timer#start" }, class: "btn btn-primary mx-2", id: "start-button" do %>
-            Start
-          <% end %>
-          <%= button_tag type: 'button', data: { action: "click->timer#togglePauseResume", timer_target: "pauseResumeButton"}, class: "btn btn-secondary mx-2", id: "pause-resume-button" do %>
-            Pause
-          <% end %>
-          <%= button_tag type: 'button', data: { action: "click->timer#end" }, class: "btn btn-accent mx-2" do %>
-            End
-          <% end %>
-        </div>
-        
-      <!-- モーダル -->
-        <div data-timer-target="modal" class="modal hidden">
-          <div class="modal-box">
-            <p>計測時間: <span data-timer-target="modalTime">00:00</span></p>
-            <div class="modal-action">
-             <button data-action="click->timer#closeModal" class="btn">閉じる</button>
+          
+          <!-- ストップウォッチのコントロールボタン -->
+          <div class="flex flex-initial">
+            <%= button_tag type: 'button', data: { action: "click->timer#start" }, class: "btn btn-primary mx-2", id: "start-button" do %>
+              Start
+            <% end %>
+            <%= button_tag type: 'button', data: { action: "click->timer#togglePauseResume", timer_target: "pauseResumeButton"}, class: "btn btn-secondary mx-2", id: "pause-resume-button" do %>
+              Pause
+            <% end %>
+            <%= button_tag type: 'button', data: { action: "click->timer#end click->modal#open"}, class: "btn btn-accent mx-2" do %>
+              End
+            <% end %>
           </div>
+          <!-- Modal Background -->
+          <div class="custom-modal-container hidden" data-modal-target="background" data-action="click->modal#closeBackground" >
+          <!-- モーダル -->
+            <div data-modal-target="container" class="modal-box">
+              <div class="m-1 bg-white rounded shadowl">
+                <p>計測時間: <span data-timer-target="modalTime"></span></p>
+                  <div class="modal-action">
+                    <button data-action="click->modal#close:prevent" class="btn">閉じる</button>
+                  </div>
+              </div>
+            </div>
+          </div>
+          <!-- 実際使う方はモーダルをrenderで別に作って上部の方に設置すると真ん中に表示されるかも -->
+          <!-- モーダルは表示の制御をするためにライブラリ使わずに実装するほうがいい -->
         </div>
       </div>
     </div>
