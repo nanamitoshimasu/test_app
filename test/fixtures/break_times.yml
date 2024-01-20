@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  break_start_time: 2023-12-05 11:35:34
+  break_end_time: 2023-12-05 11:35:34
+  total_: MyString
+
+two:
+  break_start_time: 2023-12-05 11:35:34
+  break_end_time: 2023-12-05 11:35:34
+  total_: MyString

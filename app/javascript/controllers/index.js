@@ -9,3 +9,6 @@ application.register("hello", HelloController)
 
 import TimerController from "./timer_controller"
 application.register("timer", TimerController)
+
+import { Modal } from "tailwindcss-stimulus-components"
+application.register('modal', Modal)
